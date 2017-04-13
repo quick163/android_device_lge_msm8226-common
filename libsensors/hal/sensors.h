@@ -202,7 +202,8 @@ enum {
 
 /*****************************************************************************/
 
-#define DEV_NAME_A "bma2x2"
+//#define DEV_NAME_A "bma2x2"
+#define DEV_NAME_A "accelerometer"
 
 #define EVENT_TYPE_ACCEL_X          REL_Y
 #define EVENT_TYPE_ACCEL_Y          REL_X

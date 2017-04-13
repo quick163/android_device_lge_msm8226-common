@@ -115,7 +115,7 @@ struct bmm_cfg {
 } g_bmm_cfg;
 
 static const char *driver_names_tbl[] = {
-    "bmm050",
+    "magnetic_field",
     NULL
 };
 
