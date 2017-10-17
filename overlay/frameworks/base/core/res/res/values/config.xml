@@ -21,15 +21,6 @@
      for different hardware and product builds. -->
 <resources>
 
-        <!-- Set this to true to enable the platform's auto-power-save modes like doze and
-         app standby.  These are not enabled by default because they require a standard
-         cloud-to-device messaging service for apps to interact correctly with the modes
-         (such as to be able to deliver an instant message to the device even when it is
-         dozing).  This should be enabled if you have such services and expect apps to
-         correctly use them when installed on your device.  Otherwise, keep this disabled
-         so that applications can still use their own mechanisms. -->
-    <bool name="config_enableAutoPowerModes">true</bool>
-
     <!-- ComponentName of a dream to show whenever the system would otherwise have
          gone to sleep.  When the PowerManager is asked to go to sleep, it will instead
          try to start this dream if possible.  The dream should typically call startDozing()
@@ -68,30 +59,6 @@
     -->
 
     <bool name="config_powerDecoupleInteractiveModeFromDisplay">true</bool>
-
-    <!-- Vibrator pattern for feedback about a long screen/key press -->
-    <integer-array name="config_longPressVibePattern">
-        <item>0</item>
-        <item>20</item>
-    </integer-array>
-
-    <!-- Vibrator pattern for feedback about touching a virtual key -->
-    <integer-array name="config_virtualKeyVibePattern">
-        <item>0</item>
-        <item>15</item>
-    </integer-array>
-
-    <!-- Vibrator pattern for a very short but reliable vibration for soft keyboard tap -->
-    <integer-array name="config_keyboardTapVibePattern">
-        <item>0</item>
-        <item>13</item>
-    </integer-array>
-
-    <!-- Vibrator pattern for feedback about booting with safe mode disabled -->
-    <integer-array name="config_safeModeDisabledVibePattern">
-        <item>0</item>
-        <item>15</item>
-    </integer-array>
 
     <!-- Whether to enable auto provisioning the app for new SIM card on boot.
     <bool name="config_auto_provision_enable">true</bool>
@@ -260,34 +227,6 @@
     <!-- Is the device capable of hot swapping an UICC Card -->
     <bool name="config_hotswapCapable">true</bool>
 
-    <!-- Hardware 'face' keys present on the device, stored as a bit field.
-        This integer should equal the sum of the corresponding value for each
-        of the following keys present:
-            1 - Home
-            2 - Back
-            4 - Menu
-            8 - Assistant (search)
-            16 - App switch
-            32 - Camera
-            64 - Volume rocker
-        For example, a device with Home, Back and Menu keys would set this
-        config to 7. -->
-    <integer name="config_deviceHardwareKeys">65</integer>
-
-    <!-- Hardware keys present on the device with the ability to wake, stored as a bit field.
-         This integer should equal the sum of the corresponding value for each
-         of the following keys present:
-             1 - Home
-             2 - Back
-             4 - Menu
-             8 - Assistant (search)
-            16 - App switch
-            32 - Camera
-            64 - Volume rocker
-         For example, a device with Home, Back and Menu keys would set this
-         config to 7. -->
-    <integer name="config_deviceHardwareWakeKeys">1</integer>
-
     <!-- Disable lockscreen translucent decor by default -->
     <bool name="config_enableLockScreenTranslucentDecor">true</bool>
 
@@ -336,7 +275,5 @@
         <item>"evdo:4094,87380,1048576,4096,16384,262144"</item>
         <item>"ehrpd:4094,87380,1048576,4096,16384,262144"</item>
     </string-array>
-
-   <integer name="config_longPressOnHomeBehavior">2</integer>
 
 </resources>

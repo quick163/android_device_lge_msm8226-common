@@ -24,8 +24,6 @@
 # inherit from the proprietary version
 VENDOR_PATH := device/lge/msm8226-common
 
-TARGET_SPECIFIC_HEADER_PATH += $(VENDOR_PATH)/include
-
 # Bootloader
 TARGET_NO_BOOTLOADER := true
 TARGET_NO_RADIOIMAGE := true
@@ -105,6 +103,7 @@ endif
 ifeq ($(BOARD_HAS_NFC),true)
 BOARD_NFC_CHIPSET := pn547
 BOARD_NFC_DEVICE := "/dev/pn547"
+BOARD_NFC_HAL_SUFFIX := $(TARGET_BOARD_PLATFORM)
 endif
 
 # Lights
@@ -123,6 +122,7 @@ MAX_EGL_CACHE_KEY_SIZE := 12*1024
 MAX_EGL_CACHE_SIZE := 2048*1024
 OVERRIDE_RS_DRIVER := libRSDriver_adreno.so
 TARGET_CONTINUOUS_SPLASH_ENABLED := true
+SF_START_GRAPHICS_ALLOCATOR_SERVICE := true
 TARGET_USES_C2D_COMPOSITION := true
 TARGET_USES_ION := true
 USE_OPENGL_RENDERER := true
@@ -139,6 +139,7 @@ TARGET_NO_RPC := true
 USE_DEVICE_SPECIFIC_CAMERA := true
 TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
 TARGET_HAS_LEGACY_CAMERA_HAL1 := true
+TARGET_USES_NON_TREBLE_CAMERA := true
 
 # Filesystem,
 TARGET_USERIMAGES_USE_EXT4 := true
@@ -161,7 +162,7 @@ TARGET_HW_DISK_ENCRYPTION := false
 
 # SELinux policies
 # qcom sepolicy
-include device/qcom/sepolicy/sepolicy.mk
+#include device/qcom/sepolicy/sepolicy.mk
 
-BOARD_SEPOLICY_DIRS += $(VENDOR_PATH)/sepolicy
+#BOARD_SEPOLICY_DIRS += $(VENDOR_PATH)/sepolicy
 

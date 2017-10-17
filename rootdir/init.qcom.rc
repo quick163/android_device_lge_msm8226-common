@@ -182,22 +182,26 @@ on boot
     mkdir /data/nfc 0770 nfc nfc
     mkdir /data/nfc/param 0770 nfc nfc
 
-    #BRCM Bluetooth
-    chown bluetooth net_bt_stack /sys/class/rfkill/rfkill0/type
-    chown bluetooth net_bt_stack /sys/class/rfkill/rfkill0/state
-    chown bluetooth net_bt_stack /proc/bluetooth/sleep/btwake
-    chown bluetooth net_bt_stack /proc/bluetooth/sleep/proto
-    chown bluetooth net_bt_stack /proc/bluetooth/sleep/lpm
-    chown bluetooth net_bt_stack /proc/bluetooth/sleep/btwrite
+    # BRCM Bluetooth
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
+    chown bluetooth bluetooth /proc/bluetooth/sleep/btwake
+    chown bluetooth bluetooth /proc/bluetooth/sleep/proto
+    chown bluetooth bluetooth /proc/bluetooth/sleep/lpm
+    chown bluetooth bluetooth /proc/bluetooth/sleep/btwrite
     chmod 0660 /sys/class/rfkill/rfkill0/state
     chmod 0660 /proc/bluetooth/sleep/btwake
     chmod 0660 /proc/bluetooth/sleep/proto
     chmod 0660 /proc/bluetooth/sleep/lpm
     chmod 0660 /proc/bluetooth/sleep/btwrite
-    chown bluetooth net_bt_stack /dev/ttyHS99
+    chown bluetooth bluetooth /dev/ttyHS99
     chmod 0660 /dev/ttyHS99
-    chown bluetooth net_bt_stack /sys/devices/platform/msm_serial_hs.0/clock
+    chown bluetooth bluetooth /sys/devices/platform/msm_serial_hs.0/clock
     chmod 0660 /sys/devices/platform/msm_serial_hs.0/clock
+
+    # Wifi firmware reload path
+    chown wifi wifi /sys/module/wlan/parameters/fwpath
+    chown wifi wifi /sys/module/bcmdhd/parameters/firmware_path
 
     # Led
     chown system system /sys/class/leds/red/blink
@@ -353,9 +357,6 @@ on post-fs-data
     mkdir /data/misc/location/quipc 0770 gps gps
     mkdir /data/misc/location/gsiff 0770 gps gps
 
-    #Create directory for hostapd
-    mkdir /data/hostapd 0770 system wifi
-
     mkdir /data/audio/ 0770 media audio
     # Enable the setgid bit on the directory
     chmod 2770 /data/audio
@@ -391,12 +392,12 @@ service bt-sap /system/bin/sapd 15
 service qmuxd /system/bin/qmuxd
     class main
     user radio
-    group radio audio bluetooth gps diag qcom_diag
+    group radio audio bluetooth wakelock gps diag
 
 service netmgrd /system/bin/netmgrd
     class main
     user root
-    group root wifi wakelock radio inet
+    group root wifi wakelock radio inet system
 
 service sensors /system/bin/sensors.qcom
     class late_start
@@ -408,7 +409,7 @@ service sensors /system/bin/sensors.qcom
 on property:ro.data.large_tcp_window_size=true
     write /proc/sys/net/ipv4/tcp_adv_win_scale  2
 
-service p2p_supplicant /system/bin/wpa_supplicant \
+service wpa_supplicant /vendor/bin/hw/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
     -I/system/etc/wifi/wpa_supplicant_overlay.conf -N \
     -ip2p0 -Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf \
@@ -424,26 +425,6 @@ service p2p_supplicant /system/bin/wpa_supplicant \
     disabled
     oneshot
 
-service wpa_supplicant /system/bin/wpa_supplicant \
-    -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
-    -I/system/etc/wifi/wpa_supplicant_overlay.conf \
-    -e/data/misc/wifi/entropy.bin -g@android:wpa_wlan0
-    #   we will start as root and wpa_supplicant will switch to user wifi
-    #   after setting up the capabilities required for WEXT
-    #   user wifi
-    #   group wifi inet keystore
-    class main
-    socket wpa_wlan0 dgram 660 wifi wifi
-    disabled
-    oneshot
-
-service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
-    class late_start
-    user root
-    group root
-    oneshot
-    disabled
-
 on property:ro.data.large_tcp_window_size=true
     # Adjust socket buffer to enlarge TCP receive window for high bandwidth (e.g. DO-RevB)
     write /proc/sys/net/ipv4/tcp_adv_win_scale  2
@@ -456,13 +437,12 @@ service_redefine ril-daemon /system/bin/rild
     user root
     group radio cache inet misc audio sdcard_rw qcom_oncrpc diag log net_raw
 
-service ril-daemon1 /system/bin/rild -c 2
+service ril-daemon1 /vendor/bin/hw/rild -c 2
     class main
-    socket rild2 stream 660 root radio
-    socket rild-debug2 stream 660 radio system
-    user root
-    group radio cache inet misc audio sdcard_rw qcom_oncrpc diag log net_raw
+    user radio
     disabled
+    group radio cache inet misc audio log readproc wakelock
+    capabilities BLOCK_SUSPEND NET_ADMIN NET_RAW
 
 service rild1-wrapper /system/bin/sh /system/etc/init.qcom.ril.sh
     class late_start
@@ -495,11 +475,6 @@ service time_daemon /system/bin/time_daemon
    user root
    group root
 
-service mpdecision /system/bin/mpdecision --avg_comp
-   class main
-   user root
-   group system
-
 service thermal-engine /system/vendor/bin/thermal-engine
    class main
    user root
@@ -508,9 +483,9 @@ service thermal-engine /system/vendor/bin/thermal-engine
    socket thermal-recv-client stream 0660 system system
    socket thermal-recv-passive-client stream 0666 system system
 
-service charger /sbin/healthd -c
+service charger /charger
     class charger
-    seclabel u:r:healthd:s0
+    seclabel u:r:charger:s0
 
 service adsprpcd /system/bin/adsprpcd
    class main
@@ -520,13 +495,13 @@ service adsprpcd /system/bin/adsprpcd
 #Load MAC's for BRCM
 service brcm_hwaddrs /system/bin/hwaddrs
     user root
-    group system wifi bluetooth net_bt_admin misc net_bt_stack
+    group system wifi bluetooth net_bt_admin misc bluetooth
     oneshot
     class late_start
 
 service brcm_hwaddrs2 /system/bin/bdaddr_loader
     user root
-    group system wifi bluetooth net_bt_admin misc net_bt_stack
+    group system wifi bluetooth net_bt_admin misc bluetooth
     oneshot
     disabled
 
@@ -535,7 +510,7 @@ service uim /system/bin/brcm-uim-sysfs
     class late_start
     user root
     group bluetooth net_bt_admin net_bt
-    seclabel u:r:uim:s0
+#    seclabel u:r:uim:s0
 
 on property:init.svc.brcm_hwaddrs=stopped
     chmod 644 /data/misc/wifi/config

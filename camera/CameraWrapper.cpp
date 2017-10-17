@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2016, The CyanogenMod Project
+ * Copyright (C) 2016 - The CyanogenMod Project
+ * Copyright (C) 2017 - The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +41,36 @@
 #define FRONT_CAMERA_ID 1
 
 using namespace android;
+
+static const char AUDIO_ZOOM_OFF[] = "audio-zoom";
+static const char AUDIO_ZOOM_ON[] = "audio-zoom";
+static const char AUTO_HDR_SUPPORTED[] = "auto-hdr-supported";
+static const char BEAUTY_SHOT_OFF[] = "beauty-shot";
+static const char BEAUTY_SHOT_ON[] = "beauty-shot";
+static const char BURST_SHOT_OFF[] = "burst-shot";
+static const char BURST_SHOT_ON[] = "burst-shot";
+static const char DENOISE_ON_OFF_MODES_MAP[] = "denoise-values";
+static const char FOCUS_MODE_MANUAL_POSITION[] = "manual-focus-position";
+static const char KEY_AUDIO_ZOOM[] = "audio-zoom";
+static const char KEY_AUDIO_ZOOM_SUPPORTED[] = "audio-zoom-supported";
+static const char KEY_BEAUTY_SHOT[] = "beauty-shot";
+static const char KEY_BEAUTY_SHOT_SUPPORTED[] = "beauty-shot-supported";
+static const char KEY_BURST_SHOT[] = "burst-shot";
+static const char KEY_BURST_SHOT_SUPPORTED[] = "burst-shot-supported";
+static const char KEY_FOCUS_MODE_OBJECT_TRACKING[] = "object-tracking";
+static const char KEY_FOCUS_MODE_OBJECT_TRACKING_SUPPORTED[] = "object-tracking-supported";
+static const char KEY_HDR_MODE[] = "hdr-mode";
+static const char KEY_LGE_CAMERA[] = "lge-camera";
+static const char KEY_QC_DENOISE[] = "denoise";
+static const char KEY_QC_SUPPORTED_AE_BRACKETING_MODES[] = "ae-bracket-hdr-values";
+static const char KEY_QC_ZSL[] = "zsl";
+static const char KEY_VIDEO_WDR[] = "video-wdr";
+static const char KEY_VIDEO_WDR_SUPPORTED[] = "video-wdr-supported";
+static const char OBJECT_TRACKING_ON[] = "object-tracking";
+static const char OBJECT_TRACKING_OFF[] = "object-tracking";
+static const char VIDEO_WDR_OFF[] = "video-wdr";
+static const char VIDEO_WDR_ON[] = "video-wdr";
+static const char WHITE_BALANCE_MANUAL_CCT[] = "wb-manual-cct";
 
 static Mutex gCameraWrapperLock;
 static camera_module_t *gVendorModule = 0;
@@ -354,11 +385,11 @@ static char *camera_fixup_getparams(int id, const char *settings)
         ALOGW("HDR is not supported, device: %s", board);
     }
 
-    params.set(CameraParameters::DENOISE_ON_OFF_MODES_MAP, "denoise-off,denoise-on");
+    params.set(DENOISE_ON_OFF_MODES_MAP, "denoise-off,denoise-on");
 
     /* Remove not supported options from camera apps */
-    params.set(CameraParameters::AUTO_HDR_SUPPORTED, "false");
-    params.set(CameraParameters::KEY_QC_SUPPORTED_AE_BRACKETING_MODES, "");
+    params.set(AUTO_HDR_SUPPORTED, "false");
+    params.set(KEY_QC_SUPPORTED_AE_BRACKETING_MODES, "");
 
     android::String8 strParams = params.flatten();
     char *ret = strdup(strParams.string());
@@ -400,13 +431,13 @@ static char *camera_fixup_setparams(const char *settings)
 
     /* Set "hdr-mode"="1" if fake hdr scene mode activated */
     if (photoMode && sceneModeHdr) {
-        params.set(CameraParameters::KEY_HDR_MODE, "1");
-        params.set(CameraParameters::KEY_QC_ZSL, "on");
+        params.set(KEY_HDR_MODE, "1");
+        params.set(KEY_QC_ZSL, "on");
     } else {
-        params.set(CameraParameters::KEY_HDR_MODE, "0");
+        params.set(KEY_HDR_MODE, "0");
     }
 
-    params.set(CameraParameters::KEY_LGE_CAMERA, "1");
+    params.set(KEY_LGE_CAMERA, "1");
 
     android::String8 strParams = params.flatten();
     char *ret = strdup(strParams.string());

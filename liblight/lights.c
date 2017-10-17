@@ -82,7 +82,8 @@ write_string(const char *path, const char *buffer)
 
     fd = open(path, O_RDWR);
     if (fd >= 0) {
-        int bytes = strlen(buffer);
+        char buffer[20];
+        int bytes = snprintf(buffer, sizeof(buffer), "%d\n");
         int amt = write(fd, buffer, bytes);
         close(fd);
         return amt == -1 ? -errno : 0;
@@ -291,6 +292,9 @@ static int open_lights(const struct hw_module_t* module, char const* name,
 
     struct light_device_t *dev = malloc(sizeof(struct light_device_t));
     memset(dev, 0, sizeof(*dev));
+
+    if(!dev)
+        return -ENOMEM;
 
     dev->common.tag = HARDWARE_DEVICE_TAG;
     dev->common.version = 0;
